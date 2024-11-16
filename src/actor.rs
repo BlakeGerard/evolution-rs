@@ -26,10 +26,19 @@ pub struct Actor {
 }
 
 impl Actor {
-    pub fn new() -> Self {
+    pub fn new_random() -> Self {
         Actor {
             m: rand::random::<f32>(),
             b: rand::random::<f32>(),
+            fitness: 0.0,
+            status: ActorStatus::Clear,
+        }
+    }
+
+    pub fn new_clear() -> Self {
+        Actor {
+            m: 0.0,
+            b: 0.0,
             fitness: 0.0,
             status: ActorStatus::Clear,
         }
@@ -47,12 +56,6 @@ impl Actor {
     }
 }
 
-impl Default for Actor {
-    fn default() -> Self {
-        Actor::new()
-    }
-}
-
 impl fmt::Display for Actor {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Actor {{\n")?;
@@ -65,5 +68,57 @@ impl fmt::Display for Actor {
 }
 
 pub fn random_population(size: usize) -> Vec<Actor> {
-    std::iter::repeat_with(Actor::default).take(size).collect()
+    std::iter::repeat_with(Actor::new_random)
+        .take(size)
+        .collect()
+}
+
+pub fn clear_population(size: usize) -> Vec<Actor> {
+    std::iter::repeat_with(Actor::new_clear)
+        .take(size)
+        .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn random_population_is_randomly_initialized() {
+        let pop = random_population(2);
+        for actor in pop {
+            let m_in_range = actor.m >= 0.0 && actor.m <= 1.0;
+            let b_in_range = actor.b >= 0.0 && actor.b <= 1.0;
+            assert_eq!(m_in_range && b_in_range, true);
+            assert_eq!(actor.fitness, 0.0);
+            assert!(matches!(actor.status, ActorStatus::Clear));
+        }
+    }
+
+    #[test]
+    fn clear_population_is_zero_initialized() {
+        let pop = clear_population(2);
+        for actor in pop {
+            assert_eq!(actor.m, 0.0);
+            assert_eq!(actor.b, 0.0);
+            assert_eq!(actor.fitness, 0.0);
+            assert!(matches!(actor.status, ActorStatus::Clear));
+        }
+    }
+
+    #[test]
+    fn actor_evaluate_squared_error_loss_correct() {
+        let data: Vec<(f32, f32)> = vec![(0.0, 0.0), (1.0, 2.0), (2.0, 4.0)];
+        let mut a = Actor {
+            m: 2.0,
+            b: 0.0,
+            fitness: 0.0,
+            status: ActorStatus::Clear,
+        };
+
+        let expected = 0.0;
+        a.evaluate(&data);
+
+        assert_eq!(a.fitness, expected);
+    }
 }

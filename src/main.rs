@@ -3,7 +3,11 @@ mod actor;
 const NUM_ITERS: usize = 100;
 const NUM_ACTORS: usize = 5;
 
-fn evaluate_actors(actors: &mut Vec<actor::Actor>, data: &Vec<(f32, f32)>) {
+fn reproduction(src: &Vec<actor::Actor>, dst: &mut Vec<actor::Actor>) {}
+
+fn selection(src: &Vec<actor::Actor>, dst: &mut Vec<actor::Actor>) {}
+
+fn evaluation(actors: &mut Vec<actor::Actor>, data: &Vec<(f32, f32)>) {
     for actor in actors {
         actor.evaluate(&data);
     }
@@ -17,7 +21,16 @@ fn print_actors(actors: &Vec<actor::Actor>) {
 
 fn evolution(data: &Vec<(f32, f32)>) {
     let mut arena_A = actor::random_population(NUM_ACTORS);
-    evaluate_actors(&mut arena_A, data);
+    let mut arena_B = actor::clear_population(NUM_ACTORS);
+    evaluation(&mut arena_A, data);
+    print_actors(&arena_A);
+
+    for _ in 0..NUM_ITERS {
+        selection(&arena_A, &mut arena_B);
+        reproduction(&arena_B, &mut arena_A);
+        evaluation(&mut arena_A, data);
+    }
+
     print_actors(&arena_A);
 }
 
