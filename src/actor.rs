@@ -1,6 +1,7 @@
 use std::fmt;
 
-enum ActorStatus {
+#[derive(PartialEq, Clone)]
+pub enum ActorStatus {
     Clear = 0,
     Tournament = 1,
     Selected = 2,
@@ -18,6 +19,7 @@ impl fmt::Display for ActorStatus {
     }
 }
 
+#[derive(Clone)]
 pub struct Actor {
     m: f32,
     b: f32,
@@ -53,6 +55,34 @@ impl Actor {
             let sqerror = error * error;
             self.fitness += sqerror;
         }
+    }
+
+    pub fn status(&self) -> &ActorStatus {
+        &self.status
+    }
+
+    pub fn set_status(&mut self, status: ActorStatus) {
+        self.status = status
+    }
+
+    pub fn fitness(&self) -> f32 {
+        self.fitness
+    }
+
+    pub fn m(&self) -> f32 {
+        self.m
+    }
+
+    pub fn set_m(&mut self, m: f32) {
+        self.m = m
+    }
+
+    pub fn b(&self) -> f32 {
+        self.b
+    }
+
+    pub fn set_b(&mut self, b: f32) {
+        self.b = b
     }
 }
 
